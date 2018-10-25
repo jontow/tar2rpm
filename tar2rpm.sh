@@ -89,17 +89,19 @@ function spec {
     echo "rm -fr \$RPM_BUILD_ROOT"
     echo
     echo "%files"
-    echo "/"
-    while IFS='/' read -ra pathSegments; do
-        path=''
-        for pathSegment in "${pathSegments[@]}"; do
-            path="$path/$pathSegment"
-            echo "$path"
-        done
-    done <<< $TARGET
+    #echo "/"
+    #while IFS='/' read -ra pathSegments; do
+    #    path=''
+    #    for pathSegment in "${pathSegments[@]}"; do
+    #        path="$path/$pathSegment"
+    #        echo "$path"
+    #    done
+    #done <<< $TARGET
     while IFS= read -ra fileNames; do
         for fileName in "${fileNames[@]}"; do
-            echo %attr\($FILEPERM, $FILEUSER, $FILEGROUP\) \""$TARGET/${fileName#./}"\"
+            if [ ! -d "$TARGET/${fileName#./}" ]; then
+                echo %attr\($FILEPERM, $FILEUSER, $FILEGROUP\) \""$TARGET/${fileName#./}"\"
+            fi
         done
     done <<< "$(tar -tf $TARFILE)"
 }
@@ -244,7 +246,7 @@ else
         echo "ERROR: RPM build failed. Check log: /tmp/tar2rpm-$$.log Spec file: /tmp/tar2rpm-$$.spec"
         exit 1
     fi
-    rm /tmp/tar2rpm-$$.spec
-    rm /tmp/tar2rpm-$$.log
+    #rm /tmp/tar2rpm-$$.spec
+    #rm /tmp/tar2rpm-$$.log
 fi
 exit 0
